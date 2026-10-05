@@ -1,0 +1,74 @@
+{
+  "users": [
+    {
+      "id": "330995ef-5c9e-48a5-990e-0d40771a9d19",
+      "name": "Alex Morgan",
+      "email": "alex@example.com",
+      "password": "$2b$10$bpYxJlY1jq8IdT/hHetX6uxIyFZCC4V.BEa/1lqB05MUWUyGAmFBq",
+      "created_at": "2026-10-05T04:53:32.809Z"
+    },
+    {
+      "id": "demo-user-uuid-101",
+      "name": "Demo Explorer",
+      "email": "demo.user@vaultflow.internal",
+      "password": "$2b$10$.d.WQlCbmQ6CYsAYq2IrvOtbFG1YhRDZq5fekd5.n5ZfeLgKBzMni",
+      "created_at": "2026-10-05T04:53:59.537Z"
+    },
+    {
+      "id": "aab6de28-1b29-4a12-a960-505952f1c641",
+      "name": "kasthuri s",
+      "email": "selvarajkasthuri15081984@gmail.com",
+      "password": "$2b$10$kikwQ4a1p4m5hJ2w6bzuNuwBtm9LEkVc5DvR.Z0TM3mYIQrnlza6y",
+      "created_at": "2026-10-05T04:56:00.497Z"
+    }
+  ],
+  "files": [
+    {
+      "id": "4aad99ae-ff8a-47aa-b323-edbf1def983d",
+      "user_id": "aab6de28-1b29-4a12-a960-505952f1c641",
+      "file_name": "KASTHURI S RESUME.pdf",
+      "file_type": "PDF",
+      "file_size": 59732,
+      "file_url": "/api/files/4aad99ae-ff8a-47aa-b323-edbf1def983d/download",
+      "upload_status": "Uploaded",
+      "created_at": "2026-10-05T04:57:01.397Z",
+      "storage_path": "/app/applet/data/uploads/1791176221392-502489621-KASTHURI_S_RESUME.pdf"
+    },
+    {
+      "id": "b97cf59d-9cbf-4119-b496-cdb276c833e6",
+      "user_id": "aab6de28-1b29-4a12-a960-505952f1c641",
+      "file_name": "WhatsApp Image 2026-09-29 at 9.53.10 AM.jpeg",
+      "file_type": "JPEG",
+      "file_size": 169897,
+      "file_url": "/api/files/b97cf59d-9cbf-4119-b496-cdb276c833e6/download",
+      "upload_status": "Uploaded",
+      "created_at": "2026-10-05T04:57:50.001Z",
+      "storage_path": "/app/applet/data/uploads/1791176269984-919998733-WhatsApp_Image_2026-09-29_at_9.53.10_AM.jpeg"
+    },
+    {
+      "id": "f9849182-9c50-49d5-86eb-dc5131a09031",
+      "user_id": "330995ef-5c9e-48a5-990e-0d40771a9d19",
+      "file_name": "ecommerce_portal_v1.zip",
+      "file_type": "Archive",
+      "file_size": 35,
+      "file_url": "/api/files/f9849182-9c50-49d5-86eb-dc5131a09031/download",
+      "upload_status": "Uploaded",
+      "created_at": "2026-10-05T05:03:55.032Z",
+      "storage_path": "/app/applet/data/uploads/1791176635029-806718427-ecommerce_portal_v1.zip"
+    },
+    {
+      "id": "9d4f8ef7-5611-44eb-816b-e067cd0c52fc",
+      "user_id": "330995ef-5c9e-48a5-990e-0d40771a9d19",
+      "file_name": "ecommerce_portal_v2.zip",
+      "project_title": "E-Commerce Web Portal",
+      "project_category": "Web Application",
+      "project_description": "Production ready Next.js storefront package",
+      "file_type": "Archive",
+      "file_size": 35,
+      "file_url": "/api/files/9d4f8ef7-5611-44eb-816b-e067cd0c52fc/download",
+      "upload_status": "Uploaded",
+      "created_at": "2026-10-05T05:04:05.615Z",
+      "storage_path": "/app/applet/data/uploads/1791176645606-102762906-ecommerce_portal_v2.zip"
+    }
+  ]
+}

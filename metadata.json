@@ -1,0 +1,6 @@
+{
+  "name": "VaultFlow - File Upload & Management Portal",
+  "description": "A modern, professional file upload and management portal with secure user authentication, dynamic storage statistics, and robust file storage.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
