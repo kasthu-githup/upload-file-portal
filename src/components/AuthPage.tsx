@@ -70,7 +70,24 @@ export function AuthPage({ initialMode = 'login' }: AuthPageProps) {
         success('Logged in successfully!');
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Authentication failed';
+      let msg = 'Authentication failed. Please check your credentials and try again.';
+      if (err instanceof Error) {
+        msg = err.message;
+      } else if (typeof err === 'string') {
+        msg = err;
+      } else if (err && typeof err === 'object') {
+        const obj = err as Record<string, any>;
+        if (typeof obj.message === 'string' && obj.message && obj.message !== '[object Object]') {
+          msg = obj.message;
+        } else if (typeof obj.error === 'string' && obj.error && obj.error !== '[object Object]') {
+          msg = obj.error;
+        }
+      }
+      if (!msg || msg === '[object Object]') {
+        msg = mode === 'signup' 
+          ? 'An account with this email address already exists. Please sign in.' 
+          : 'Invalid email or password. Please verify and try again.';
+      }
       setErrorMessage(msg);
       error(msg);
     } finally {
@@ -165,8 +182,23 @@ export function AuthPage({ initialMode = 'login' }: AuthPageProps) {
           </div>
 
           {errorMessage && (
-            <div className="mb-5 p-3 rounded-lg bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 text-xs text-rose-700 dark:text-rose-300 font-medium">
-              {errorMessage}
+            <div className="mb-5 p-3.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900/80 text-xs text-rose-700 dark:text-rose-300 font-medium flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
+                <span>{errorMessage}</span>
+              </div>
+              {errorMessage.toLowerCase().includes('already exists') && mode === 'signup' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode('login');
+                    setErrorMessage(null);
+                  }}
+                  className="self-start text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer pt-0.5"
+                >
+                  <span>Click here to sign in with your password →</span>
+                </button>
+              )}
             </div>
           )}
 

@@ -8,6 +8,9 @@ interface AuthContextType {
   signup: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  updateProfile: (data: { name?: string; currentPassword?: string; newPassword?: string }) => Promise<{ user: User; message: string }>;
+  uploadAvatar: (file: File) => Promise<{ user: User; avatar_url: string; message: string }>;
+  removeAvatar: () => Promise<{ user: User; message: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -64,8 +67,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateProfile = async (data: { name?: string; currentPassword?: string; newPassword?: string }) => {
+    const res = await api.updateProfile(data);
+    setUser(res.user);
+    return res;
+  };
+
+  const uploadAvatar = async (file: File) => {
+    const res = await api.uploadAvatar(file);
+    setUser(res.user);
+    return res;
+  };
+
+  const removeAvatar = async () => {
+    const res = await api.removeAvatar();
+    setUser(res.user);
+    return res;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, refreshProfile }}>
+    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, refreshProfile, updateProfile, uploadAvatar, removeAvatar }}>
       {children}
     </AuthContext.Provider>
   );

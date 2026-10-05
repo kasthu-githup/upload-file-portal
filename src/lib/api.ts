@@ -2,6 +2,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  avatar_url?: string;
   created_at: string;
 }
 
@@ -62,10 +63,27 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     let errorMessage = `Request failed (${response.status})`;
     try {
       const errorData = await response.json();
-      errorMessage = errorData.error || errorData.message || errorMessage;
+      if (typeof errorData === 'string') {
+        errorMessage = errorData;
+      } else if (errorData && typeof errorData === 'object') {
+        if (typeof errorData.error === 'string') {
+          errorMessage = errorData.error;
+        } else if (errorData.error && typeof errorData.error === 'object' && typeof errorData.error.message === 'string') {
+          errorMessage = errorData.error.message;
+        } else if (typeof errorData.message === 'string') {
+          errorMessage = errorData.message;
+        } else if (errorData.error) {
+          errorMessage = JSON.stringify(errorData.error);
+        }
+      }
     } catch {
       // Ignore json parse error
     }
+
+    if (response.status === 409) {
+      errorMessage = 'An account with this email address already exists. Please sign in instead.';
+    }
+
     throw new Error(errorMessage);
   }
 
@@ -104,6 +122,55 @@ export const api = {
 
   async getProfile(): Promise<{ user: User; stats: DashboardStats }> {
     return request<{ user: User; stats: DashboardStats }>('/api/profile');
+  },
+
+  async updateProfile(data: { name?: string; currentPassword?: string; newPassword?: string }): Promise<{ user: User; token: string; message: string }> {
+    const res = await request<{ user: User; token: string; message: string }>('/api/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (res.token) {
+      setStoredToken(res.token);
+    }
+    return res;
+  },
+
+  async uploadAvatar(file: File): Promise<{ user: User; avatar_url: string; message: string }> {
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    const token = getStoredToken();
+    const headers: Record<string, string> = {
+      Accept: 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch('/api/profile/avatar', {
+      method: 'POST',
+      headers,
+      body: formData,
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      let errorMsg = 'Failed to upload profile picture';
+      try {
+        const data = await response.json();
+        errorMsg = data.error || data.message || errorMsg;
+      } catch {}
+      throw new Error(errorMsg);
+    }
+
+    return response.json();
+  },
+
+  async removeAvatar(): Promise<{ user: User; message: string }> {
+    return request<{ user: User; message: string }>('/api/profile/avatar', {
+      method: 'DELETE',
+    });
   },
 
   // Files

@@ -123,17 +123,20 @@ export function Sidebar({ activeTab, setActiveTab, mobileOpen, setMobileOpen }: 
 
           {/* User badge */}
           <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-700 shrink-0 border border-slate-200 dark:border-slate-700">
+            {user?.avatar_url ? (
               <img
-                src="/src/assets/images/avatar_default_user_1791175879569.jpg"
-                alt={user?.name || 'User Avatar'}
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover"
+                src={user.avatar_url}
+                alt={user.name}
+                className="w-8 h-8 rounded-full object-cover shrink-0 border border-slate-200 dark:border-slate-700 shadow-2xs"
                 onError={(e) => {
                   (e.target as HTMLElement).style.display = 'none';
                 }}
               />
-            </div>
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                {user?.name ? user.name.slice(0, 2).toUpperCase() : 'VF'}
+              </div>
+            )}
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">{user?.name || 'User'}</p>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{user?.email || 'user@vaultflow.internal'}</p>

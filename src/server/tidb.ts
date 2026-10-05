@@ -120,9 +120,17 @@ class TiDBClient {
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL,
-        created_at VARCHAR(64) NOT NULL
+        created_at VARCHAR(64) NOT NULL,
+        avatar_url TEXT
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
+
+    // In case table already existed without avatar_url
+    try {
+      await conn.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT;`);
+    } catch {
+      // Ignore if column already exists
+    }
 
     // Create files table
     await conn.query(`

@@ -26,8 +26,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const addToast = useCallback((message: string, type: ToastType = 'info') => {
+    let cleanMsg = typeof message === 'string' ? message : '';
+    if (!cleanMsg || cleanMsg === '[object Object]') {
+      cleanMsg = type === 'error' ? 'An error occurred. Please try again.' : 'Success';
+    }
     const id = Math.random().toString(36).substring(2, 9);
-    setToasts((prev) => [...prev, { id, type, message }]);
+    setToasts((prev) => [...prev, { id, type, message: cleanMsg }]);
     setTimeout(() => {
       removeToast(id);
     }, 4500);

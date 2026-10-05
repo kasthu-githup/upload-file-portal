@@ -20,6 +20,21 @@
       "email": "selvarajkasthuri15081984@gmail.com",
       "password": "$2b$10$kikwQ4a1p4m5hJ2w6bzuNuwBtm9LEkVc5DvR.Z0TM3mYIQrnlza6y",
       "created_at": "2026-10-05T04:56:00.497Z"
+    },
+    {
+      "id": "bacecdf2-bb3e-4017-856c-8b3f16b52205",
+      "name": "Madhes Waran",
+      "email": "madheswaran1108@gmail.com",
+      "password": "$2b$10$nsfwNYTHnJWxzxpfUWK2HeXPsr6BdCDTEtOHGxqKTx.ldSaw1fENi",
+      "created_at": "2026-10-05T07:14:54.999Z",
+      "avatar_url": "/api/profile/avatar/bacecdf2-bb3e-4017-856c-8b3f16b52205?t=1791185052267"
+    },
+    {
+      "id": "41ae1afa-d44b-49f0-95af-11e51a05eb7f",
+      "name": "Anuratha",
+      "email": "anu123@gmail.com",
+      "password": "$2b$10$bCSKaQlow4qJwinxv2bJy.yzq0e4fjQkiuIHhQsA6myscJgsoQ2u6",
+      "created_at": "2026-10-05T07:18:11.015Z"
     }
   ],
   "files": [
@@ -69,6 +84,48 @@
       "upload_status": "Uploaded",
       "created_at": "2026-10-05T05:04:05.615Z",
       "storage_path": "/app/applet/data/uploads/1791176645606-102762906-ecommerce_portal_v2.zip"
+    },
+    {
+      "id": "ebfd5ed5-f832-4ac9-bd04-fcc9a3d9bce7",
+      "user_id": "aab6de28-1b29-4a12-a960-505952f1c641",
+      "file_name": "kasthu nm cloud.pdf",
+      "project_title": "Kasthu nm cloud",
+      "project_category": "Software Deliverable",
+      "project_description": "",
+      "file_type": "PDF",
+      "file_size": 272545,
+      "file_url": "/api/files/ebfd5ed5-f832-4ac9-bd04-fcc9a3d9bce7/download",
+      "upload_status": "Uploaded",
+      "created_at": "2026-10-05T06:17:06.188Z",
+      "storage_path": "/app/applet/data/uploads/1791181026178-306546859-kasthu_nm_cloud.pdf"
+    },
+    {
+      "id": "a260007f-6514-4f79-b444-dc63d4846e0f",
+      "user_id": "aab6de28-1b29-4a12-a960-505952f1c641",
+      "file_name": "event.html",
+      "project_title": "Event",
+      "project_category": "Web Application",
+      "project_description": "",
+      "file_type": "Text",
+      "file_size": 3268,
+      "file_url": "/api/files/a260007f-6514-4f79-b444-dc63d4846e0f/download",
+      "upload_status": "Uploaded",
+      "created_at": "2026-10-05T06:20:31.544Z",
+      "storage_path": "/app/applet/data/uploads/1791181231542-44009693-event.html"
+    },
+    {
+      "id": "29034f61-a3d2-495e-bc17-484edacf5e0d",
+      "user_id": "bacecdf2-bb3e-4017-856c-8b3f16b52205",
+      "file_name": "KASTHURI S RESUME.pdf",
+      "project_title": "KASTHURI S RESUME",
+      "project_category": "Project Documentation",
+      "project_description": "",
+      "file_type": "PDF",
+      "file_size": 59732,
+      "file_url": "/api/files/29034f61-a3d2-495e-bc17-484edacf5e0d/download",
+      "upload_status": "Uploaded",
+      "created_at": "2026-10-05T07:15:37.357Z",
+      "storage_path": "/app/applet/data/uploads/1791184537352-52414935-KASTHURI_S_RESUME.pdf"
     }
   ]
 }

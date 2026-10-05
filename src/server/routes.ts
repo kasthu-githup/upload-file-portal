@@ -100,6 +100,7 @@ router.post('/auth/signup', async (req, res): Promise<void> => {
         id: user.id,
         name: user.name,
         email: user.email,
+        avatar_url: user.avatar_url,
         created_at: user.created_at,
       },
     });
@@ -147,6 +148,7 @@ router.post('/auth/login', async (req, res): Promise<void> => {
         id: user.id,
         name: user.name,
         email: user.email,
+        avatar_url: user.avatar_url,
         created_at: user.created_at,
       },
     });
@@ -172,10 +174,198 @@ router.get('/profile', requireAuth, (req: AuthenticatedRequest, res: Response): 
       id: user.id,
       name: user.name,
       email: user.email,
+      avatar_url: user.avatar_url,
       created_at: user.created_at,
     },
     stats,
   });
+});
+
+// PUT /api/profile (Update name and/or password)
+router.put('/profile', requireAuth, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const user = req.user!;
+    const { name, currentPassword, newPassword } = req.body;
+
+    if (name && (typeof name !== 'string' || name.trim().length < 2)) {
+      res.status(400).json({ error: 'Name must be at least 2 characters long.' });
+      return;
+    }
+
+    let updatedPasswordHash: string | undefined;
+    if (newPassword) {
+      if (typeof newPassword !== 'string' || newPassword.length < 6) {
+        res.status(400).json({ error: 'New password must be at least 6 characters long.' });
+        return;
+      }
+      if (!currentPassword) {
+        res.status(400).json({ error: 'Please enter your current password to set a new password.' });
+        return;
+      }
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        res.status(400).json({ error: 'Current password is incorrect.' });
+        return;
+      }
+      updatedPasswordHash = await bcrypt.hash(newPassword, 10);
+    }
+
+    const updatedUser = db.updateUser(user.id, {
+      name: name ? name.trim() : undefined,
+      password: updatedPasswordHash,
+    });
+
+    if (!updatedUser) {
+      res.status(404).json({ error: 'User not found.' });
+      return;
+    }
+
+    const newToken = generateToken(updatedUser);
+    res.cookie('vault_token', newToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      message: 'Profile updated successfully',
+      token: newToken,
+      user: {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        avatar_url: updatedUser.avatar_url,
+        created_at: updatedUser.created_at,
+      },
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ error: 'Failed to update profile.' });
+  }
+});
+
+// POST /api/profile/avatar (Upload new profile picture)
+router.post('/profile/avatar', requireAuth, upload.single('avatar'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const user = req.user!;
+    const file = req.file;
+
+    if (!file) {
+      res.status(400).json({ error: 'No image uploaded. Please choose an image file.' });
+      return;
+    }
+
+    if (!file.mimetype.startsWith('image/')) {
+      try { fs.unlinkSync(file.path); } catch {}
+      res.status(400).json({ error: 'Please select a valid image file (JPG, PNG, WEBP, or GIF).' });
+      return;
+    }
+
+    // Move file to a designated permanent avatar filename
+    const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
+    const avatarFilename = `avatar-${user.id}${ext}`;
+    const avatarPath = path.resolve(UPLOADS_DIR, avatarFilename);
+
+    try {
+      if (fs.existsSync(avatarPath)) {
+        fs.unlinkSync(avatarPath);
+      }
+    } catch {}
+
+    fs.renameSync(file.path, avatarPath);
+
+    const avatarUrl = `/api/profile/avatar/${user.id}?t=${Date.now()}`;
+    const updatedUser = db.updateUser(user.id, {
+      avatar_url: avatarUrl,
+    });
+
+    if (!updatedUser) {
+      res.status(404).json({ error: 'User not found.' });
+      return;
+    }
+
+    res.status(200).json({
+      message: 'Profile picture updated successfully!',
+      avatar_url: avatarUrl,
+      user: {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        avatar_url: updatedUser.avatar_url,
+        created_at: updatedUser.created_at,
+      },
+    });
+  } catch (error) {
+    console.error('Avatar upload error:', error);
+    res.status(500).json({ error: 'Failed to upload profile picture.' });
+  }
+});
+
+// GET /api/profile/avatar/:userId (Serve profile picture)
+router.get('/profile/avatar/:userId', (req, res): void => {
+  try {
+    const { userId } = req.params;
+    const user = db.findUserById(userId);
+    if (!user || !user.avatar_url) {
+      res.status(404).json({ error: 'Avatar not found' });
+      return;
+    }
+
+    const files = fs.readdirSync(UPLOADS_DIR);
+    const avatarFile = files.find(f => f.startsWith(`avatar-${userId}`));
+    if (!avatarFile) {
+      res.status(404).json({ error: 'Avatar file not found on disk' });
+      return;
+    }
+
+    const filePath = path.resolve(UPLOADS_DIR, avatarFile);
+    if (!fs.existsSync(filePath)) {
+      res.status(404).json({ error: 'Avatar file missing' });
+      return;
+    }
+
+    const ext = path.extname(avatarFile).toLowerCase();
+    const contentType = ext === '.png' ? 'image/png' : ext === '.webp' ? 'image/webp' : ext === '.gif' ? 'image/gif' : 'image/jpeg';
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    fs.createReadStream(filePath).pipe(res);
+  } catch (error) {
+    console.error('Avatar read error:', error);
+    res.status(500).json({ error: 'Failed to load avatar' });
+  }
+});
+
+// DELETE /api/profile/avatar (Remove profile picture)
+router.delete('/profile/avatar', requireAuth, (req: AuthenticatedRequest, res: Response): void => {
+  try {
+    const user = req.user!;
+    const files = fs.readdirSync(UPLOADS_DIR);
+    const avatarFiles = files.filter(f => f.startsWith(`avatar-${user.id}`));
+    for (const af of avatarFiles) {
+      try {
+        fs.unlinkSync(path.resolve(UPLOADS_DIR, af));
+      } catch {}
+    }
+
+    const updatedUser = db.updateUser(user.id, {
+      avatar_url: null,
+    });
+
+    res.status(200).json({
+      message: 'Profile picture removed successfully.',
+      user: {
+        id: updatedUser?.id || user.id,
+        name: updatedUser?.name || user.name,
+        email: updatedUser?.email || user.email,
+        avatar_url: undefined,
+        created_at: updatedUser?.created_at || user.created_at,
+      },
+    });
+  } catch (error) {
+    console.error('Avatar delete error:', error);
+    res.status(500).json({ error: 'Failed to remove avatar picture.' });
+  }
 });
 
 // ================= FILE MANAGEMENT ROUTES =================

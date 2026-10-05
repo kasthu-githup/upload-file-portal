@@ -9,6 +9,7 @@ export interface UserRecord {
   name: string;
   email: string;
   password: string; // bcrypt hashed
+  avatar_url?: string;
   created_at: string;
 }
 
@@ -109,6 +110,33 @@ class Database {
     }
 
     return newUser;
+  }
+
+  public updateUser(id: string, updates: { name?: string; password?: string; avatar_url?: string | null }): UserRecord | null {
+    const userIndex = this.data.users.findIndex(u => u.id === id);
+    if (userIndex === -1) return null;
+
+    const user = this.data.users[userIndex];
+    if (updates.name && updates.name.trim().length >= 2) {
+      user.name = updates.name.trim();
+    }
+    if (updates.password) {
+      user.password = updates.password;
+    }
+    if (updates.avatar_url !== undefined) {
+      user.avatar_url = updates.avatar_url === null ? undefined : updates.avatar_url;
+    }
+    this.save();
+
+    // Sync to TiDB if connected
+    if (tidb.isConnected && tidb.getPool()) {
+      tidb.getPool()?.query(
+        'UPDATE users SET name = ?, password = ?, avatar_url = ? WHERE id = ?',
+        [user.name, user.password, user.avatar_url || null, user.id]
+      ).catch((err: unknown) => console.warn('[TiDB] User update sync warning:', err));
+    }
+
+    return user;
   }
 
   // --- Files Operations ---
