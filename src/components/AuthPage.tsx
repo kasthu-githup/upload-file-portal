@@ -83,9 +83,9 @@ export function AuthPage({ initialMode = 'login' }: AuthPageProps) {
           msg = obj.error;
         }
       }
-      if (!msg || msg === '[object Object]') {
+      if (!msg || msg === '[object Object]' || msg.toLowerCase().includes('could not be found') || msg.toLowerCase().includes('page not found')) {
         msg = mode === 'signup' 
-          ? 'An account with this email address already exists. Please sign in.' 
+          ? 'An account with this email address already exists or server connection failed. Please sign in.' 
           : 'Invalid email or password. Please verify and try again.';
       }
       setErrorMessage(msg);
